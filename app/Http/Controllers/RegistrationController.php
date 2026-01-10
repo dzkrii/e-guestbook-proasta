@@ -31,15 +31,14 @@ class RegistrationController extends Controller
         // findOrFail berfungsi: jika ID tidak ketemu, otomatis error 404
         $event = Event::with('category')->findOrFail($id);
 
-        // --- LOGIKA 1: CEK BATAS WAKTU (H-1) ---
-        // Carbon::parse mengubah string tanggal database jadi objek tanggal
-        // subDay() mengurangi 1 hari dari tanggal acara
-        // greaterThanOrEqualTo() membandingkan waktu sekarang dengan batas H-1
-        if (now()->greaterThanOrEqualTo(Carbon::parse($event->event_date)->subDay())) {
-            // Jika telat, tampilkan view khusus "Pendaftaran Ditutup"
+        // --- LOGIKA 1: CEK BATAS WAKTU ---
+        // Pendaftaran ditutup HANYA jika acara sudah lewat / sudah mulai
+        // Kita menghapus ->subDay() agar peserta bisa daftar sampai detik-detik acara dimulai
+        if (now()->greaterThan(Carbon::parse($event->event_date))) {
+            // Jika acara sudah lewat
             return view('registration.closed', [
                 'title' => 'Pendaftaran Ditutup',
-                'message' => 'Mohon maaf, pendaftaran untuk acara ini sudah ditutup karena acara akan dimulai besok (H-1) atau sudah lewat.'
+                'message' => 'Mohon maaf, pendaftaran untuk acara ini sudah ditutup karena acara sudah dimulai atau telah berakhir.'
             ]);
         }
 
