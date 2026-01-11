@@ -24,7 +24,7 @@
                     </div>
                     <span class="font-bold text-xl text-gray-800 tracking-tight">E-GuestBook</span>
                 </div>
-                <div class="flex items-center gap-4">
+                <!-- <div class="flex items-center gap-4">
                     @auth
                         <a href="{{ url('/dashboard') }}"
                             class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Dashboard Admin</a>
@@ -32,7 +32,7 @@
                         <a href="{{ route('login') }}"
                             class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Admin Login</a>
                     @endauth
-                </div>
+                </div> -->
             </div>
         </div>
     </nav>
