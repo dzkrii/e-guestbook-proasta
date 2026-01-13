@@ -18,6 +18,7 @@ use HasFactory;
         'qr_code_token',
         'is_attended',
         'attended_at',
+        'arrival_order',
         'type',        // Umum / Mahasiswa
         'institution', // Asal Kampus
         'major',       // Jurusan

@@ -72,10 +72,16 @@ class ScanController extends Controller
             ]);
         }
 
+        // Hitung urutan kedatangan
+        $arrivalOrder = Registration::where('event_id', $registration->event_id)
+            ->where('is_attended', true)
+            ->max('arrival_order') + 1; // Pakai max + 1 lebih aman daripada count + 1 menghindari duplikat jika ada yang dihapus
+
         // E. SUKSES: Update Status Kehadiran
         $registration->update([
             'is_attended' => true,
-            'attended_at' => now() // Catat waktu scan
+            'attended_at' => now(), // Catat waktu scan
+            'arrival_order' => $arrivalOrder
         ]);
 
         // Kirim respon sukses ke Frontend biar layar jadi Hijau
@@ -121,7 +127,7 @@ class ScanController extends Controller
                     $query->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
                 }
-                $query->orderBy('created_at', 'desc');
+                $query->orderByRaw('arrival_order IS NULL ASC, arrival_order ASC');
             }
         ])
             ->orderBy('event_date', 'desc')
@@ -226,13 +232,29 @@ class ScanController extends Controller
             'whatsapp' => 'required',
         ]);
 
-        $registration->update([
+        // Logika penanganan status kehadiran & arrival_order
+        $isAttended = $request->has('is_attended') ? true : false;
+        $updateData = [
             'name' => $request->name,
             'email' => $request->email,
             'whatsapp' => $request->whatsapp,
-            // Cek checkbox: jika dicentang berarti true, jika tidak berarti false
-            'is_attended' => $request->has('is_attended') ? true : false,
-        ]);
+            'is_attended' => $isAttended,
+        ];
+
+        // Jika status berubah jadi Hadir (dan sebelumnya belum)
+        if ($isAttended && !$registration->is_attended) {
+            $updateData['attended_at'] = now();
+            $updateData['arrival_order'] = Registration::where('event_id', $registration->event_id)
+                ->where('is_attended', true)
+                ->max('arrival_order') + 1;
+        }
+        // Bunda status berubah jadi Tidak Hadir (dan sebelumnya hadir)
+        elseif (!$isAttended && $registration->is_attended) {
+            $updateData['attended_at'] = null;
+            $updateData['arrival_order'] = null;
+        }
+
+        $registration->update($updateData);
 
         return redirect()->route('admin.participants')->with('success', 'Data peserta berhasil diperbarui.');
     }

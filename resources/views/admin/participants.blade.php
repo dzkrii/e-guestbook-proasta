@@ -63,6 +63,7 @@
                                         <th class="px-4 py-3">Nama Peserta</th>
                                         <th class="px-4 py-3">Kontak</th>
                                         <th class="px-4 py-3 text-center">Status</th>
+                                        <th class="px-4 py-3 text-center">No. Urut</th>
                                         <th class="px-4 py-3">Waktu Hadir</th>
                                         <th class="px-4 py-3 text-center">Aksi</th>
                                     </tr>
@@ -86,6 +87,9 @@
                                                         class="px-2 py-1 text-xs font-bold leading-tight text-red-700 bg-red-100 rounded-full">Belum
                                                         Hadir</span>
                                                 @endif
+                                            </td>
+                                            <td class="px-4 py-4 text-center text-sm font-bold text-gray-800">
+                                                {{ $reg->arrival_order ? '#' . $reg->arrival_order : '-' }}
                                             </td>
                                             <td class="px-4 py-4 text-sm text-gray-500">
                                                 {{ $reg->attended_at ? $reg->attended_at->format('H:i, d M') : '-' }}
